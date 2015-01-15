@@ -1,59 +1,30 @@
 
 <div id="page">
-      <div id="sidebar">
-      </div>
-
-      <div id="content">
-
-        <div id="getting-started">
+        <span id="whatever">teste</span>
             url teste <% url_search %>
             sugestions  <% sugestions %>
 
-----------------
-
-<div class="floating-bar">
-            <div class="header-bar">
-                   <!-- <div class="grid-12 clearfix area-principal"> -->
-    <div class="menu-area to-left" data-analytics="S">
-      <div class="menu-button">
-        <div class="burger">
-          <b></b>
-          <b></b>
-          <b></b>
-        </div>
         <span class="menu-label">MENU</span>
-      </div>
-      <span class="menu-produto"></span>
-    </div>
-    <a class="logo-area" href="http://g1.globo.com/">
-        <h1 class="logo icon-produto">G1</h1>
     </a>
     <div class="to-right">
         <div class="search-area">
-            <form id="frmBuscaScroll" action="#">
+            <form id="frmBuscaScroll" action="/livesearch">
                 <input id="search-input-floating" type="text" name="q" placeholder="BUSCAR" class="search" />
                 <label for="search-input-floating" class="glass-container"><div class="glass"><div class="iglass css3pie"></div></div></label>
             </form>
         </div>
-
-        
     </div>
 </div>
-
----------------
                     
 
-          <div id="about-content" style="display: none;">
-          </div>
+<script type="text/javascript">
+    $(function() {
+        $('#search-input-floating').keypress(function() {
+            var searched = $(this).val();
+            $.get('/livesearch', function(data) {
+                $('#whatever').text(data.length);
+            });
+        });        
+    });
+</script>
 
-    <script type="text/javascript">
- 
-    $( "#search-input-floating" ).keypress(function() {
-        console.log( "Handler for .keypress() called." );
-        $( "#frmBuscaScroll" ).attr('action', "/livesearch").submit();
-      });
- 
-    </script>
-        </div>
-      </div>
-    </div>

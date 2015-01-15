@@ -17,11 +17,12 @@ get '/' => sub {
 
 get '/livesearch' => sub {
     
-    my $proc = 'dílm';
+    my $params = shift;
+    if (defined $params ){ print $params; }
+    my $searched ='Dilm';
     my $vars = {};
-    my $unaccented_proc = unac_string('UTF-8', $proc);
-    #nao esquecer de fazer o uppercase para a pesquisa e os termos da queries
-    open ( my $json_file_source, '<', "/home/jac/development/gistfile1.json" ) or die "nao abriu o arquivo corretamente ";
+    my $unaccented_searched = unac_string('UTF-8', $searched);
+    open ( my $json_file_source, '<', "gistfile1.json" ) or die "nao abriu o arquivo corretamente ";
     my $json_source = '';
     while ( <$json_file_source> ){
         $json_source .= $_ ;
@@ -38,13 +39,13 @@ get '/livesearch' => sub {
         my $n_queries = scalar( @{ $highlights->[$count_search]->{queries}} );
         my $count_search_queries = 0;
         while ( $count_search_queries < $n_queries ){
-            if ( index ( lc $highlights->[$count_search]->{queries}[$count_search_queries], lc $unaccented_proc ) != -1 ){
+            if ( index ( lc $highlights->[$count_search]->{queries}[$count_search_queries], lc $unaccented_searched ) != -1 ){
                 $vars->{url_search} = $highlights->[$count_search]->{url};
                 my $title =  Encode::encode( 'UTF-8', decode_entities ( $highlights->[$count_search]->{title}) );
                 my $unaccented_title = unac_string('UTF-8', $title);
                 my $count_sugestions = 0;
                 while ( $count_sugestions < scalar ( @$sugestions ) ){
-                    if ( index( $sugestions->[$count_sugestions], $unaccented_proc ) != -1 ||
+                    if ( index( lc $sugestions->[$count_sugestions], lc $unaccented_searched ) != -1 ||
                          index ( lc $sugestions->[$count_sugestions], lc $unaccented_title ) != -1 ){
                           $vars->{sugestions} = $sugestions->[$count_sugestions];
                     }
@@ -56,6 +57,8 @@ get '/livesearch' => sub {
         
         $count_search+=1;
     }
+    my $encoded_json = to_json( $vars->{sugestions} );
+    $encoded_json = $encoded_json . to_json( $vars->{url_searched} );
     template 'index' => { url_search => $vars->{url_search}, sugestions => $vars->{sugestions} } ;
 
 };
