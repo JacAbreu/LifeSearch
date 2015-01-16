@@ -1,30 +1,60 @@
 
-<div id="page">
+<div id="search-page">
         <span id="whatever">teste</span>
-            url teste <% url_search %>
-            sugestions  <% sugestions %>
-
-        <span class="menu-label">MENU</span>
+            
     </a>
     <div class="to-right">
         <div class="search-area">
-            <form id="frmBuscaScroll" action="/livesearch">
-                <input id="search-input-floating" type="text" name="q" placeholder="BUSCAR" class="search" />
-                <label for="search-input-floating" class="glass-container"><div class="glass"><div class="iglass css3pie"></div></div></label>
+                <input id="looking" type="text" placeholder="BUSCAR" class="search" />
             </form>
         </div>
     </div>
+    <br>
+    <br> <br>
+            <span id="whatever2">teste2</span> 
 </div>
                     
 
 <script type="text/javascript">
+    var cache = [];
+    $(document).ready(function(){
+        $( "#looking" ).autocomplete({
+            delay: 500,
+            source: function( request, response ){
+                $.ajax('/livesearch',{
+                    method: 'POST',
+                    data: { q: $('#looking').val() },
+                    success: function(result){
+                        console.log(result);
+                        response(result.sugestions);
+                    }
+                });
+            }            
+        });
+    });
+/*
+        $('#looking').keypress(function() {
+            $.ajax('/livesearch',{
+                method: 'POST',
+                data: { q: $('#looking').val() },
+                success: function(result){
+                    console.log(result);
+                    cache.push(result.sugestions);
+                    $('#looking').append(result.sugestions);
+                    $('#whatever2').text(result.sugestions);
+                }
+            })
+        })
+    });
+/*
     $(function() {
-        $('#search-input-floating').keypress(function() {
+        var searched_cache
             var searched = $(this).val();
             $.get('/livesearch', function(data) {
                 $('#whatever').text(data.length);
+                $('#whatever2'.text(data.sugestions);
             });
         });        
-    });
+    */
 </script>
 

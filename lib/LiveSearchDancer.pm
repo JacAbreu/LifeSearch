@@ -15,11 +15,11 @@ get '/' => sub {
     template 'index';
 };
 
-get '/livesearch' => sub {
-    
-    my $params = shift;
-    if (defined $params ){ print $params; }
-    my $searched ='Dilm';
+post '/livesearch' => sub {
+    content_type 'application/json';
+    #print 'aaaa ' . params->{'q'};
+    #my $searched ='Dilm';
+    my $searched = param('q');
     my $vars = {};
     my $unaccented_searched = unac_string('UTF-8', $searched);
     open ( my $json_file_source, '<', "gistfile1.json" ) or die "nao abriu o arquivo corretamente ";
@@ -34,20 +34,23 @@ get '/livesearch' => sub {
     my $sugestions = $decoded_json->{suggestions} ;
     my $n_highlights = scalar ( @$highlights );
     my $count_search = 0;
+    my @urls;
+    my @suggestions;
 
     while ( $count_search < $n_highlights ){
         my $n_queries = scalar( @{ $highlights->[$count_search]->{queries}} );
         my $count_search_queries = 0;
         while ( $count_search_queries < $n_queries ){
             if ( index ( lc $highlights->[$count_search]->{queries}[$count_search_queries], lc $unaccented_searched ) != -1 ){
-                $vars->{url_search} = $highlights->[$count_search]->{url};
+                push @urls, $highlights->[$count_search]->{url};
                 my $title =  Encode::encode( 'UTF-8', decode_entities ( $highlights->[$count_search]->{title}) );
                 my $unaccented_title = unac_string('UTF-8', $title);
                 my $count_sugestions = 0;
+                
                 while ( $count_sugestions < scalar ( @$sugestions ) ){
                     if ( index( lc $sugestions->[$count_sugestions], lc $unaccented_searched ) != -1 ||
                          index ( lc $sugestions->[$count_sugestions], lc $unaccented_title ) != -1 ){
-                          $vars->{sugestions} = $sugestions->[$count_sugestions];
+                          push @suggestions, $sugestions->[$count_sugestions];
                     }
                     $count_sugestions += 1;
                 }
@@ -57,9 +60,7 @@ get '/livesearch' => sub {
         
         $count_search+=1;
     }
-    my $encoded_json = to_json( $vars->{sugestions} );
-    $encoded_json = $encoded_json . to_json( $vars->{url_searched} );
-    template 'index' => { url_search => $vars->{url_search}, sugestions => $vars->{sugestions} } ;
+    return to_json { url_search => @urls, sugestions => \@suggestions } ;
 
 };
 
