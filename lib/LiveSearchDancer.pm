@@ -7,7 +7,7 @@ use utf8;
 use HTML::Entities;
 use Encode;
 use Text::Unaccent;
-
+use List::MoreUtils qw(uniq);
 
 our $VERSION = '0.1';
 
@@ -60,7 +60,8 @@ post '/livesearch' => sub {
         
         $count_search+=1;
     }
-    return to_json { url_search => @urls, sugestions => \@suggestions } ;
+    my @uniq_suggestions = uniq @suggestions;
+    return to_json { url_search => @urls, sugestions => \@uniq_suggestions } ;
 
 };
 
