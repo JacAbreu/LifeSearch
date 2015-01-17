@@ -1,17 +1,11 @@
 
 <div id="search-page">
-        <span id="whatever">teste</span>
-            
-    </a>
+       
     <div class="to-right">
         <div class="search-area">
                 <input id="looking" type="text" placeholder="BUSCAR" class="search" />
-            </form>
         </div>
     </div>
-    <br>
-    <br> <br>
-            <span id="whatever2">teste2</span> 
 </div>
                     
 
@@ -25,8 +19,8 @@
                     method: 'POST',
                     data: { q: $('#looking').val() },
                     success: function(result){
+                        response(result.suggestions);
                         console.log(result);
-                        response(result.sugestions);
                     }
                 });
             }            
