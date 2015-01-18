@@ -1,16 +1,24 @@
 
-<div id="search-page">
-       
-    <div class="to-right">
-        <div class="search-area">
-                <input id="looking" type="text" placeholder="BUSCAR" class="search" />
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 col-md-offset-3">
+                <div class="input-group">
+                    <input id="looking" type="text" placeholder="Buscar Por" class="form-control search" />
+                </div>
+            </div>
         </div>
     </div>
-</div>
                     
 
 <script type="text/javascript">
-    var cache = [];
+    
+    function isUrl(s) {
+        alert(s);
+        var regexp = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/ ;
+        return regexp.test(s);
+    };
+    
     $(document).ready(function(){
         $( "#looking" ).autocomplete({
             delay: 500,
@@ -19,36 +27,15 @@
                     method: 'POST',
                     data: { q: $('#looking').val() },
                     success: function(result){
-                        response(result.suggestions);
-                        console.log(result);
+                        response(result.suggestions.map(function(item) { return {label:item, url:'http://g1.globo.com/busca/?q=' + encodeURIComponent(item)} }));
                     }
                 });
-            }            
+            },
+            select: function (event, ui) {
+                window.location = ui.item.url;
+            },
+            html: true
         });
     });
-/*
-        $('#looking').keypress(function() {
-            $.ajax('/livesearch',{
-                method: 'POST',
-                data: { q: $('#looking').val() },
-                success: function(result){
-                    console.log(result);
-                    cache.push(result.sugestions);
-                    $('#looking').append(result.sugestions);
-                    $('#whatever2').text(result.sugestions);
-                }
-            })
-        })
-    });
-/*
-    $(function() {
-        var searched_cache
-            var searched = $(this).val();
-            $.get('/livesearch', function(data) {
-                $('#whatever').text(data.length);
-                $('#whatever2'.text(data.sugestions);
-            });
-        });        
-    */
 </script>
 

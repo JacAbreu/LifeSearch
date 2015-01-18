@@ -39,14 +39,16 @@ post '/livesearch' => sub {
         my $n_queries = scalar( @{ $highlights->[$count_search]->{queries}} );
         my $count_search_queries = 0;
         while ( $count_search_queries < $n_queries ){
-               if ( length( $unaccented_searched) > 2 && index ( lc $highlights->[$count_search]->{queries}[$count_search_queries], lc $unaccented_searched ) != -1 ){
-                push @urls, $highlights->[$count_search]->{url};
+               if ( index ( lc $highlights->[$count_search]->{queries}[$count_search_queries], lc $unaccented_searched ) != -1 ){
+                    if( length( $unaccented_searched) > 2 ){
+                        push @urls, $highlights->[$count_search]->{url};
+                    }
                 my $title =  Encode::encode( 'UTF-8', decode_entities ( $highlights->[$count_search]->{title}) );
                 my $unaccented_title = unac_string('UTF-8', $title);
                 my $count_suggestions = 0;
                 
                 while ( $count_suggestions < scalar ( @$suggestions ) ){
-                    if ( index( lc $suggestions->[$count_suggestions], lc $unaccented_searched ) != -1 ||
+                    if ( index( lc $suggestions->[$count_suggestions], lc $unaccented_searched ) != -1  ||
                          index ( lc $suggestions->[$count_suggestions], lc $unaccented_title ) != -1 ){
                             push @suggestions, $suggestions->[$count_suggestions];
                     }
@@ -55,11 +57,14 @@ post '/livesearch' => sub {
             }
             $count_search_queries += 1;
         }
-        
         $count_search+=1;
     }
-    my @uniq_suggestions = uniq @suggestions;
-    return to_json { suggestions => \@uniq_suggestions } ;
+    
+    my @indications;
+    push (@indications, @urls);
+    push (@indications, @suggestions);
+    my @uniq_indications = uniq @indications;
+    return to_json { suggestions => \@uniq_indications } ;
 
 };
 
