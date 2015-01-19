@@ -2,7 +2,6 @@ package LiveSearchDancer;
 use Dancer ':syntax';
 
 use JSON qw( decode_json );
-use Data::Dumper;
 use utf8;
 use HTML::Entities;
 use Encode;
@@ -39,9 +38,10 @@ post '/livesearch' => sub {
         my $n_queries = scalar( @{ $highlights->[$count_search]->{queries}} );
         my $count_search_queries = 0;
         while ( $count_search_queries < $n_queries ){
-               if ( index ( lc $highlights->[$count_search]->{queries}[$count_search_queries], lc $unaccented_searched ) != -1 ){
-                    if( length( $unaccented_searched) > 2 ){
-                        push @urls, $highlights->[$count_search]->{url};
+               if ( index ( lc Encode::encode( 'UTF-8', decode_entities ($highlights->[$count_search]->{queries}[$count_search_queries])), lc $unaccented_searched  ) != -1 ){
+                    if( length( $unaccented_searched) > 1 ){
+                        push @urls, {url =>$highlights->[$count_search]->{url},
+                                      suggestion => Encode::encode( 'UTF-8', decode_entities ( $highlights->[$count_search]->{queries}[$count_search_queries] ) ) } ;
                     }
                 my $title =  Encode::encode( 'UTF-8', decode_entities ( $highlights->[$count_search]->{title}) );
                 my $unaccented_title = unac_string('UTF-8', $title);
@@ -50,7 +50,8 @@ post '/livesearch' => sub {
                 while ( $count_suggestions < scalar ( @$suggestions ) ){
                     if ( index( lc $suggestions->[$count_suggestions], lc $unaccented_searched ) != -1  ||
                          index ( lc $suggestions->[$count_suggestions], lc $unaccented_title ) != -1 ){
-                            push @suggestions, $suggestions->[$count_suggestions];
+                            push @suggestions, {suggestion => $suggestions->[$count_suggestions],
+                                                  url        => 'http://g1.globo.com/busca/?q=' . $suggestions->[$count_suggestions] };
                     }
                     $count_suggestions += 1;
                 }

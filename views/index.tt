@@ -27,7 +27,7 @@
                     method: 'POST',
                     data: { q: $('#looking').val() },
                     success: function(result){
-                        response(result.suggestions.map(function(item) { return {label:item, url:'http://g1.globo.com/busca/?q=' + encodeURIComponent(item)} }));
+                        response(result.suggestions.map(function(item) { return {label:item.suggestion, url: item.url } }));
                     }
                 });
             },
